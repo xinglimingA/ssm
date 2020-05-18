@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlm.dao.DepartmentDao">
+
+    <sql id="deptParameter">
+        id,dept_name
+    </sql>
+
+    <insert id="addDepartment"  parameterType="department" useGeneratedKeys="true" keyProperty="id">
+      insert into dept(dept_name)value(#{deptName})
+    </insert>
+
+    <insert id="addDepartmentSelective"  parameterType="department" useGeneratedKeys="true" keyProperty="id">
+        insert into dept
+        <trim prefix="(" suffix=")"  suffixOverrides=",">
+            <if test="deptName != null and deptName != ''">
+                dept_name,
+            </if>
+        </trim>
+        value
+        <trim prefix="(" suffix=")"  suffixOverrides=",">
+            <if test="deptName != null and deptName != ''">
+                #{deptName},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateDepartment" parameterType="department">
+        update dept set dept_name = #{deptName} where id = #{id}
+    </update>
+
+    <update id="updateDepartmentSelective" parameterType="department">
+        UPDATE  dept
+        <set>
+            <if test="id != null and id !=''">
+                id = #{id},
+            </if>
+            <if test="deptName != null and deptName !=''">
+                dept_name = #{deptName},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDepartment" parameterType="string">
+        delete from dept where id = #{id}
+    </delete>
+
+    <select id="getDepartmentById" parameterType="string" resultType="department">
+        select
+        <include refid="deptParameter"/>
+        from dept
+        where id = #{id}
+    </select>
+
+    <select id="getDepartmentByIdWithEmp" parameterType="string" resultMap="departmentMap">
+        select
+        <include refid="deptParameter"/>
+        from dept
+        where id = #{id}
+    </select>
+
+    <select id="getAllDepartments" resultType="department">
+        select
+        <include refid="deptParameter"/>
+        from dept
+    </select>
+
+    <select id="getAllDepartmentsWithEmp" resultMap="departmentMap">
+        select
+        <include refid="deptParameter"/>
+        from dept
+    </select>
+
+    <resultMap id="departmentMap" type="department">
+        <id column="id" property="id"/>
+        <result column="dept_name" property="deptName"/>
+        <collection property="employees" column="id" javaType="arraylist" ofType="employee" select="com.xlm.dao.EmployeeDao.getEmployeeByDeptId"/>
+    </resultMap>
+
+</mapper>

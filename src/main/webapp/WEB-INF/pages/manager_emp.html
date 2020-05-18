@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link>
+    <meta charset="utf-8">
+    <title>员工信息查询</title>
+    <link rel="stylesheet" th:href="@{../static/bootstrap-3.3.7-dist/css/bootstrap.min.css}">
+    <script type="text/javascript" th:src="@{../static/js/jquery-3.3.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{../static/bootstrap-3.3.7-dist/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>员工信息查询</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 col-sm-offset-8">
+                <button class="btn btn-primary">添加</button>
+                <button class="btn btn-danger">删除</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-hover">
+                    <tr>
+                        <th>#</th>
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>年龄</th>
+                        <th>联系方式</th>
+                        <th>所在部门</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr th:each="emp:${pageInfo.list}">
+                        <td th:text="${emp.id}"></td>
+                        <td th:text="${emp.empName}"></td>
+                        <td th:text="${emp.empSex}==0?'女':'男'"></td>
+                        <td th:text="${emp.empAge}"></td>
+                        <td th:text="${emp.empTel}"></td>
+                        <td th:text="${emp.department.deptName}"></td>
+                        <td>
+                            <button class="btn btn-info btn-sm">编辑</button>
+                            <button class="btn btn-danger btn-sm">删除</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                当前第<span th:text="${pageInfo.pageNum}"></span>页,共<span th:text="${pageInfo.pages}"></span>页,<span th:text="${pageInfo.total}"></span>条记录.
+            </div>
+            <div class="col-md-6">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li th:class="${pageInfo.isFirstPage}?'disabled':''"><a th:href="@{/employee/list(page=1)}">首页</a></li>
+                        <li th:if="${pageInfo.hasPreviousPage}">
+                            <a th:href="@{/employee/list(page=${pageInfo.pageNum}-1)}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li th:each="pageNum:${pageInfo.navigatepageNums}" th:class="${pageNum} == ${pageInfo.pageNum}?'active':''">
+                            <a th:text="${pageNum}" th:href="@{/employee/list(page=${pageNum})}"></a>
+                        </li>
+                        <li th:if="${pageInfo.hasNextPage}">
+                            <a th:href="@{/employee/list(page=${pageInfo.pageNum}+1)}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li th:class="${pageInfo.isLastPage}?'disabled':''"><a th:href="@{/employee/list(page=${pageInfo.pages})}">尾页</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

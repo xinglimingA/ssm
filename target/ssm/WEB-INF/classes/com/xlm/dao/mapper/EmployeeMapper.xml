@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xlm.dao.EmployeeDao">
+
+    <sql id="empParameter">
+        id,emp_name,emp_age,emp_sex,emp_tel,emp_dept
+    </sql>
+
+    <insert id="addEmployee"  parameterType="employee" useGeneratedKeys="true" keyProperty="id">
+        insert into emp(emp_name,emp_age,emp_sex,emp_tel,emp_dept)value(#{empName},#{empAge},#{empSex},#{empTel},#{department.id})
+    </insert>
+
+    <insert id="addEmployeeSelective"  parameterType="employee" useGeneratedKeys="true" keyProperty="id">
+        insert into emp
+        <trim prefix="(" suffix=")"  suffixOverrides=",">
+            <if test="empName != null and empName != ''">
+                emp_name,
+            </if>
+            <if test="empAge != null and empAge != ''">
+                emp_age,
+            </if>
+            <if test="empSex != null and empSex!= ''">
+                emp_sex,
+            </if>
+            <if test="empTel != null and empTel != ''">
+                emp_tel,
+            </if>
+            <if test="department != null and department.id != null and department.id != ''">
+                emp_dept
+            </if>
+        </trim>
+        value
+        <trim prefix="(" suffix=")"  suffixOverrides=",">
+            <if test="empName != null and empName != ''">
+                #{empName},
+            </if>
+            <if test="empAge != null and empAge != ''">
+                #{empAge},
+            </if>
+            <if test="empSex != null and empSex!= ''">
+                #{empSex},
+            </if>
+            <if test="empTel != null and empTel != ''">
+                #{empTel},
+            </if>
+            <if test="department != null and department.id != null and department.id != ''">
+                #{department.id}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateEmployee" parameterType="employee">
+        update emp set emp_name = #{empName},emp_age = #{empAge},emp_sex = #{empSex},emp_tel = #{empTel},emp_dept = #{department.id}  where id = #{id}
+    </update>
+
+    <update id="updateEmployeeSelective" parameterType="employee">
+        UPDATE  emp
+        <set>
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName},
+            </if>
+            <if test="empAge != null and empAge != ''">
+                emp_age = #{empAge},
+            </if>
+            <if test="empSex != null and empSex!= ''">
+                emp_sex = #{empSex},
+            </if>
+            <if test="empTel != null and empTel != ''">
+                emp_tel = #{empTel},
+            </if>
+            <if test="department != null and department.id != null and department.id != ''">
+                emp_dept = #{department.id}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEmployee" parameterType="string">
+        delete from emp where id = #{id}
+    </delete>
+
+    <delete id="deleteEmployees" parameterType="list">
+        delete from emp where id in
+        <foreach collection="array" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getEmployeeById" parameterType="string" resultMap="employeeMap">
+        select
+        <include refid="empParameter"/>
+        from emp
+        where id = #{id}
+    </select>
+
+    <select id="getEmployeeByDeptId" parameterType="string" resultType="employee">
+        select
+        <include refid="empParameter"/>
+        from emp
+        where emp_dept = #{deptId}
+    </select>
+
+    <select id="getAllEmployees" resultMap="employeeMap">
+        select
+        <include refid="empParameter"/>
+        from emp
+    </select>
+
+    <select id="countByExample" parameterType="employee" resultType="int">
+        select count(*) from emp
+        <where>
+            <if test="empName != null and empName != ''">
+                emp_name = #{empName}
+            </if>
+            <if test="empAge != null and empAge != ''">
+                and emp_age = #{empAge}
+            </if>
+            <if test="empSex != null and empSex!= ''">
+                and emp_sex = #{empSex}
+            </if>
+            <if test="empTel != null and empTel != ''">
+                and emp_tel = #{empTel}
+            </if>
+            <if test="department != null and department.id != null and department.id != ''">
+                and emp_dept = #{department.id}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="employeeMap" type="employee">
+        <id column="id" property="id"/>
+        <result column="emp_name" property="empName"/>
+        <result column="emp_age" property="empAge"/>
+        <result column="emp_sex" property="empSex"/>
+        <result column="emp_tel" property="empTel"/>
+        <association property="department" column="emp_dept" javaType="department"   select="com.xlm.dao.DepartmentDao.getDepartmentById"/>
+    </resultMap>
+</mapper>
